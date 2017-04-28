@@ -61,11 +61,18 @@ namespace astar
                 int l = ox + Closed[i].x * cs + 1;
                 int t = oy + Closed[i].y * cs + 1;
 
-                bufferg.FillRectangle(Brushes.Red,
-                    l,
-                    t,
-                    cs - 2,
-                    cs - 2);
+                if (Closed[i].inPath)
+                    bufferg.FillRectangle(Brushes.Blue,
+                        l,
+                        t,
+                        cs - 2,
+                        cs - 2);
+                else
+                    bufferg.FillRectangle(Brushes.Red,
+                        l,
+                        t,
+                        cs - 2,
+                        cs - 2);
 
                 /*bufferg.DrawString("" + Closed[i].cost,
                     this.Font,
@@ -157,7 +164,7 @@ namespace astar
 
         List<Node> Path = new List<Node>();
 
-        private void AddNode(int x, int y, int cost, int parentx, int parenty)
+        private void AddNode(int x, int y, int cost, Node parent)
         {
             if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
                 return;
@@ -173,7 +180,10 @@ namespace astar
             if (n != null)
             {
                 if (n.cost > cost)
+                {
                     n.cost = cost;
+                    n.Parent = parent;
+                }
             }
             else
             {
@@ -183,8 +193,7 @@ namespace astar
                     y = y,
                     cost = cost,
                     heu = heuCompute(x, y, destinationX, destinationY),
-                    parentx = parentx,
-                    parenty = parenty
+                    Parent = parent
                 });
             }
         }
@@ -214,16 +223,24 @@ namespace astar
             {
                 Open.Clear();
 
+                do
+                {
+                    Path.Add(n);
+                    n.inPath = true;
+                    n = n.Parent;
+                } while (n != null);
 
+                Path.Reverse();
 
+                Invalidate();
 
                 return;
             }
 
-            AddNode(n.x + 1, n.y, n.cost + 1, n.x, n.y);
-            AddNode(n.x, n.y + 1, n.cost + 1, n.x, n.y);
-            AddNode(n.x - 1, n.y, n.cost + 1, n.x, n.y);
-            AddNode(n.x, n.y - 1, n.cost + 1, n.x, n.y);
+            AddNode(n.x + 1, n.y, n.cost + 1, n);
+            AddNode(n.x, n.y + 1, n.cost + 1, n);
+            AddNode(n.x - 1, n.y, n.cost + 1, n);
+            AddNode(n.x, n.y - 1, n.cost + 1, n);
 
             if (r++ % 10 == 0)
                 Invalidate();
@@ -244,6 +261,12 @@ namespace astar
                     Invalidate();
                 }
             }
+        }
+
+
+        public void MyThread()
+        {
+
         }
     }
 }
