@@ -44,18 +44,40 @@ namespace astar
                 bufferg.DrawLine(Pens.Black, ox + x * cs, oy, ox + x * cs, oy + gridHeight * cs);
 
             for (int i = 0; i < Closed.Count; i++)
+            {
+                int l = ox + Closed[i].x * cs + 1;
+                int t = oy + Closed[i].y * cs + 1;
+
                 bufferg.FillRectangle(Brushes.Red,
-                    ox + Closed[i].x * cs + 1,
-                    oy + Closed[i].y * cs + 1,
+                    l,
+                    t,
                     cs - 2,
                     cs - 2);
 
+                bufferg.DrawString("" + Closed[i].cost,
+                    this.Font,
+                    Brushes.Black, l, t);
+            }
+
             for (int i = 0; i < Open.Count; i++)
+            {
+                int l = ox + Open[i].x * cs + 1;
+                int t = oy + Open[i].y * cs + 1;
+
                 bufferg.FillRectangle(Brushes.Green,
-                    ox + Open[i].x * cs + 1,
-                    oy + Open[i].y * cs + 1,
+                    l,
+                    t,
                     cs - 2,
                     cs - 2);
+
+                bufferg.DrawString("" + Open[i].cost,
+                    this.Font,
+                    Brushes.Black, l, t);
+
+                bufferg.DrawString("" + Open[i].heu,
+                    this.Font,
+                    Brushes.Black, l + cs / 2, t + cs / 2);
+            }
 
             e.Graphics.DrawImage(buffer, ClientRectangle.Left, ClientRectangle.Top);
         }
@@ -67,13 +89,6 @@ namespace astar
         int gridWidth = 50;
         int gridHeight = 50;
 
-        public void SetSizes(int gridWidth, int gridHeight)
-        {
-            this.gridWidth = gridWidth;
-            this.gridHeight = gridHeight;
-            Refresh();
-        }
-
         List<Node> Open = new List<Node>();
         List<Node> Closed = new List<Node>();
 
@@ -82,13 +97,23 @@ namespace astar
 
         private int heuCompute(int ax, int ay, int bx, int by)
         {
-            return Math.Abs(ax - bx) + Math.Abs(ay - by);
+            return (int)
+                Math.Sqrt(
+                    Math.Pow(ax - bx, 2)
+                    +
+                    Math.Pow(ay - by, 2)
+                );
+
+            //return Math.Abs(ax - bx) + Math.Abs(ax - bx);
         }
 
-        public void AstarInit(int sx, int sy, int dx, int dy)
+        public void AstarInit(int sx, int sy, int dx, int dy, int gridWidth, int gridHeight)
         {
             destinationX = dx;
             destinationY = dy;
+
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
 
             Open.Clear();
             Closed.Clear();
@@ -100,6 +125,8 @@ namespace astar
                 cost = 0,
                 heu = heuCompute(sx, sy, dx, dy)
             });
+
+            Refresh();
         }
 
         public Node isInList(List<Node> list, int x, int y)
@@ -161,8 +188,8 @@ namespace astar
             AddNode(n.x - 1, n.y, n.cost + 1);
             AddNode(n.x, n.y - 1, n.cost + 1);
 
-            //if (r++ % 1000 == 0)
-                Invalidate();
+            if (r++ % 10 == 0)
+            Invalidate();
         }
     }
 }

@@ -45,7 +45,7 @@ namespace astar
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            astar_Control1.AstarInit(0, 0, 49, 49);
+            astar_Control1.AstarInit(0, 0, 99, 99, 100, 100);
         }
 
         private void Form1_Load(object sender, EventArgs e)
