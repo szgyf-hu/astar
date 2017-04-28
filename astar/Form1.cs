@@ -30,11 +30,27 @@ namespace astar
         private void stepToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // algoritmus lép
+            astar_Control1.AstarStep();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             stepToolStripMenuItem_Click(null, null);
+        }
+
+        private void astar_Control1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void startToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            astar_Control1.AstarInit(0, 0, 49, 49);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

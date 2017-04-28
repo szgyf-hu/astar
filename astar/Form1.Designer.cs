@@ -58,6 +58,7 @@
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
             this.startToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.startToolStripMenuItem.Text = "Start";
+            this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
             // 
             // stepToolStripMenuItem
             // 
@@ -71,7 +72,7 @@
             // űToolStripMenuItem
             // 
             this.űToolStripMenuItem.Name = "űToolStripMenuItem";
-            this.űToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.űToolStripMenuItem.Size = new System.Drawing.Size(80, 22);
             this.űToolStripMenuItem.Text = "ű";
             // 
             // runToolStripMenuItem
@@ -90,6 +91,7 @@
             // 
             // timer1
             // 
+            this.timer1.Interval = 1;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // astar_Control1
@@ -111,6 +113,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
