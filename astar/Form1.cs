@@ -16,5 +16,25 @@ namespace astar
         {
             InitializeComponent();
         }
+
+        private void runToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = true;
+        }
+
+        private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+        }
+
+        private void stepToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // algoritmus lép
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            stepToolStripMenuItem_Click(null, null);
+        }
     }
 }
