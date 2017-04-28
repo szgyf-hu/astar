@@ -27,21 +27,34 @@ namespace astar
             Invalidate();
         }
 
+        int cs;
+        int ox;
+        int oy;
+
         protected override void OnPaint(PaintEventArgs e)
         {
-            int cs = Math.Min(
+            cs = Math.Min(
                 (int)(buffer.Width * 0.9 / gridWidth),
                 (int)(buffer.Height * 0.9 / gridHeight)
                 );
 
-            int ox = (buffer.Width - cs * gridWidth) / 2;
-            int oy = (buffer.Height - cs * gridHeight) / 2;
+            ox = (buffer.Width - cs * gridWidth) / 2;
+            oy = (buffer.Height - cs * gridHeight) / 2;
 
             for (int y = 0; y < gridHeight + 1; y++)
                 bufferg.DrawLine(Pens.Black, ox, oy + y * cs, ox + cs * gridWidth, oy + y * cs);
 
             for (int x = 0; x < gridWidth + 1; x++)
                 bufferg.DrawLine(Pens.Black, ox + x * cs, oy, ox + x * cs, oy + gridHeight * cs);
+
+            for (int y = 0; y < gridHeight; y++)
+                for (int x = 0; x < gridWidth; x++)
+                    if (walls[x, y])
+                        bufferg.FillRectangle(Brushes.Black,
+                            ox + x * cs + 1,
+                            oy + y * cs + 1,
+                            cs - 2,
+                            cs - 2);
 
             for (int i = 0; i < Closed.Count; i++)
             {
@@ -54,9 +67,9 @@ namespace astar
                     cs - 2,
                     cs - 2);
 
-                bufferg.DrawString("" + Closed[i].cost,
+                /*bufferg.DrawString("" + Closed[i].cost,
                     this.Font,
-                    Brushes.Black, l, t);
+                    Brushes.Black, l, t);*/
             }
 
             for (int i = 0; i < Open.Count; i++)
@@ -70,13 +83,13 @@ namespace astar
                     cs - 2,
                     cs - 2);
 
-                bufferg.DrawString("" + Open[i].cost,
+                /*bufferg.DrawString("" + Open[i].cost,
                     this.Font,
                     Brushes.Black, l, t);
 
                 bufferg.DrawString("" + Open[i].heu,
                     this.Font,
-                    Brushes.Black, l + cs / 2, t + cs / 2);
+                    Brushes.Black, l + cs / 2, t + cs / 2);*/
             }
 
             e.Graphics.DrawImage(buffer, ClientRectangle.Left, ClientRectangle.Top);
@@ -95,6 +108,8 @@ namespace astar
         int destinationX;
         int destinationY;
 
+        bool[,] walls = new bool[50, 50];
+
         private int heuCompute(int ax, int ay, int bx, int by)
         {
             return (int)
@@ -112,6 +127,8 @@ namespace astar
             destinationX = dx;
             destinationY = dy;
 
+            walls = new bool[gridWidth, gridHeight];
+
             this.gridWidth = gridWidth;
             this.gridHeight = gridHeight;
 
@@ -126,7 +143,7 @@ namespace astar
                 heu = heuCompute(sx, sy, dx, dy)
             });
 
-            Refresh();
+            Invalidate();
         }
 
         public Node isInList(List<Node> list, int x, int y)
@@ -138,9 +155,14 @@ namespace astar
             return null;
         }
 
-        private void AddNode(int x, int y, int cost)
+        List<Node> Path = new List<Node>();
+
+        private void AddNode(int x, int y, int cost, int parentx, int parenty)
         {
             if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
+                return;
+
+            if (walls[x, y])
                 return;
 
             if (isInList(Closed, x, y) != null)
@@ -160,7 +182,9 @@ namespace astar
                     x = x,
                     y = y,
                     cost = cost,
-                    heu = heuCompute(x, y, destinationX, destinationY)
+                    heu = heuCompute(x, y, destinationX, destinationY),
+                    parentx = parentx,
+                    parenty = parenty
                 });
             }
         }
@@ -169,6 +193,9 @@ namespace astar
 
         public void AstarStep()
         {
+            if (Open.Count == 0)
+                return;
+
             int total = Open[0].total;
             int idx = 0;
 
@@ -183,13 +210,40 @@ namespace astar
             Open.RemoveAt(idx);
             Closed.Add(n);
 
-            AddNode(n.x + 1, n.y, n.cost + 1);
-            AddNode(n.x, n.y + 1, n.cost + 1);
-            AddNode(n.x - 1, n.y, n.cost + 1);
-            AddNode(n.x, n.y - 1, n.cost + 1);
+            if (n.x == destinationX && n.y == destinationY)
+            {
+                Open.Clear();
+
+
+
+
+                return;
+            }
+
+            AddNode(n.x + 1, n.y, n.cost + 1, n.x, n.y);
+            AddNode(n.x, n.y + 1, n.cost + 1, n.x, n.y);
+            AddNode(n.x - 1, n.y, n.cost + 1, n.x, n.y);
+            AddNode(n.x, n.y - 1, n.cost + 1, n.x, n.y);
 
             if (r++ % 10 == 0)
-            Invalidate();
+                Invalidate();
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (e.Button == MouseButtons.Right)
+            {
+                int cx = (e.X - ox) / cs;
+                int cy = (e.Y - oy) / cs;
+
+                if (!walls[cx, cy])
+                {
+                    walls[cx, cy] = true;
+                    Invalidate();
+                }
+            }
         }
     }
 }

@@ -13,5 +13,7 @@ namespace astar
         public int cost;
         public int heu;
         public int total { get { return (int)(0.5*cost + 2*heu); } }
+        public int parentx;
+        public int parenty;
     }
 }
